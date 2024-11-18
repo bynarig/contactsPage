@@ -1,0 +1,73 @@
+/* contacts.scss */
+.running-text-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  height: 500px; /* Increased the height */
+  margin-bottom: 20px;
+}
+@media (max-width: 1000px) {
+  .running-text-container{
+    height: 0
+  }
+}
+*{
+  font-family: Inter,serif;
+}
+.running-text {
+  position: absolute;
+  top: 100%; /* Start from below the container */
+  animation: runText 8s linear infinite;
+  white-space: nowrap;
+  font-size: 90px; /* Adjust font size as needed */
+  font-weight: 300;
+  font-family: Inter, serif;
+  color: #fff; /* White text */
+}
+
+.running-text:nth-child(2) {
+  animation-delay: 0.8s; /* Delay for the second instance */
+}
+.running-text:nth-child(3) {
+  animation-delay: 1.6s; /* Delay for the second instance */
+}
+.running-text:nth-child(4) {
+  animation-delay: 2.4s; /* Delay for the second instance */
+}
+.running-text:nth-child(4) {
+  animation-delay: 3.2s; /* Delay for the second instance */
+}
+.running-text:nth-child(5) {
+  animation-delay: 4s; /* Delay for the second instance */
+}
+.running-text:nth-child(6) {
+  animation-delay: 4.8s; /* Delay for the second instance */
+}
+.running-text:nth-child(7) {
+  animation-delay: 5.6s; /* Delay for the second instance */
+}
+.running-text:nth-child(8) {
+  animation-delay: 6.4s; /* Delay for the second instance */
+}
+.running-text:nth-child(9) {
+  animation-delay: 7.2s; /* Delay for the second instance */
+}
+.running-text:nth-child(10) {
+  animation-delay: 8s; /* Delay for the second instance */
+}
+
+//.running-text:nth-child(6) {
+//  //animation-delay: 2.87s; /* Delay for the second instance */
+//}
+
+
+
+@keyframes runText {
+  0% {
+    top: 100%; /* Start from below the container */
+  }
+  100% {
+    top: -100%; /* Move to above the container */
+  }
+}
+
