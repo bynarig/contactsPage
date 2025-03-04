@@ -1,0 +1,37 @@
+{
+
+  "compilerOptions": {
+"allowImportingTsExtensions": true,
+    "baseUrl": "./",
+    "target": "es2016",
+    "module": "esnext",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": ["dom", "dom.iterable", "esnext", "es5", "es6"],
+    "allowSyntheticDefaultImports": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "paths": {
+      "#/*": ["./src/*"],
+      "#utils/*": ["./src/utils/*"],
+      "#controllers/*": ["./src/controllers/*"],
+      "#data/*": ["./src/data/*"],
+      "#dtos/*": ["./src/dtos/*"],
+      "#models/*": ["./src/models/*"],
+      "#middlewares/*": ["./src/middlewares/*"],
+      "#tests/*": ["./tests/*"]
+    }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  },
+
+  "include": ["src", "playwright.config.ts", "tests"]
+}
