@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port 8904 --host",
+    "dev": "vite --port 6789 --host",
     "lint": "eslint src",
     "prod": "vite build && serve -s dist -p 6789",
     "pretty": "prettier './**/**.{ts,tsx,js,jsx,mjs,cjs,css,scss,sass,md,*.json,.prettierrc,.lintstagedrc,.babelrc,.eslintrc,*.webmanifest}'",

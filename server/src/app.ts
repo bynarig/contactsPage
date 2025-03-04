@@ -5,7 +5,7 @@ import router from '#/routes/router.ts';
 import ApplicationStartupService from './services/application-startup.service';
 
 const app = express();
-const PORT = process.env.PORT || 8905;
+const PORT = process.env.PORT || 6790;
 
 // Middleware
 app.use(express.json());
@@ -26,7 +26,7 @@ async function startServer() {
     await startupService.initialize();
 
     // Start Express server
-    app.listen(process.env.PORT | 6790, '0.0.0.0', () => {
+    app.listen(6790, '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
