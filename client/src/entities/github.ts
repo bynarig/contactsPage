@@ -2,9 +2,9 @@
 import axios from 'axios';
 import {Repository} from './types/github.types';
 
-import {PUBLIC_IP} from '#/env';
+import {PUBLIC_IP} from '#env';
 
-const API_BASE_URL = `http://${PUBLIC_IP}:8905/github`;
+const API_BASE_URL = `http://${PUBLIC_IP}:6790/github`;
 
 export const fetchRepositories = async (username: string): Promise<Repository[]> => {
   try {

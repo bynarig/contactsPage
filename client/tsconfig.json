@@ -18,7 +18,8 @@
     "noEmit": true,
     "jsx": "preserve",
     "paths": {
-      "#/*": ["./src/*"]
+      "#/*": ["./src/*"],
+      "#env": ["./env.ts"]
     }
   },
 

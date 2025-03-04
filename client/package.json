@@ -6,12 +6,13 @@
   "scripts": {
     "dev": "vite --port 8904 --host",
     "lint": "eslint src",
-    "prod": "vite build && serve -s dist -p 8904",
+    "prod": "vite build && serve -s dist -p 6789",
     "pretty": "prettier './**/**.{ts,tsx,js,jsx,mjs,cjs,css,scss,sass,md,*.json,.prettierrc,.lintstagedrc,.babelrc,.eslintrc,*.webmanifest}'",
     "format": "pnpm pretty --write"
   },
   "imports": {
-    "#/*": "./src/*"
+    "#/*": "./src/*",
+    "#env": "./env.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",

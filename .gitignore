@@ -9,7 +9,7 @@ node_modules/
 /out/
 /.next/
 /server/dist/
-/client/build/
+/client/dist/
 
 # Environment variables
 .env
@@ -44,3 +44,5 @@ yarn-error.log*
 # OS specific files
 .DS_Store
 Thumbs.db
+
+dist
