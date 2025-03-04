@@ -1,7 +1,8 @@
 // server/src/interfaces/cache.interface.ts
 import { Repository } from '../types/github.types';
+import { IApplicationLifecycle } from './application-lifecycle.interface';
 
-export interface ICacheService {
+export interface ICacheService extends IApplicationLifecycle {
   /**
    * Connect to the cache storage
    */

@@ -1,9 +1,9 @@
 // client/src/features/GithubCard.tsx
-import { useEffect, useState, useMemo } from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import Card from '#/shared/ui/Card';
-import { getLanguageImage } from '#/entities/LangToImage';
-import { fetchRepositories } from '#/entities/github';
-import { Repository } from '#/entities/types/github.types';
+import {getLanguageImage} from '#/entities/LangToImage';
+import {fetchRepositories} from '#/entities/github';
+import {Repository} from '#/entities/types/github.types';
 
 export default function GithubCard() {
   const [repositories, setRepositories] = useState<Repository[]>([]);
@@ -12,14 +12,18 @@ export default function GithubCard() {
   const [search, setSearch] = useState<string>('');
   const [filter, setFilter] = useState<string>('all');
 
+  // client/src/features/GithubCard.tsx
   useEffect(() => {
     const fetchRepos = async () => {
+      setLoading(true);
       try {
+        console.log('Attempting to fetch repositories...');
         const repos = await fetchRepositories('bynarig');
+        console.log('Successfully retrieved repositories:', repos.length);
         setRepositories(repos);
       } catch (err) {
+        console.error('Detailed error:', err);
         setError('Failed to fetch repositories');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -39,7 +43,7 @@ export default function GithubCard() {
   const filteredRepos = useMemo(() => {
     return repositories.filter(repo => {
       const matchesSearch = repo.name.toLowerCase().includes(search.toLowerCase()) ||
-                            (repo.description?.toLowerCase().includes(search.toLowerCase()) ?? false);
+        (repo.description?.toLowerCase().includes(search.toLowerCase()) ?? false);
       const matchesFilter = filter === 'all' || repo.language === filter;
       return matchesSearch && matchesFilter;
     });

@@ -1,23 +1,29 @@
 // server/src/services/redis.service.ts
 import { createClient } from 'redis';
-import { Repository } from '../types/github.types';
-import { ICacheService } from '../interfaces/cache.interface';
-import { IGitHubService } from '../interfaces/github.interface';
+import { IApplicationLifecycle } from '../interfaces/application-lifecycle.interface';
 
-class RedisService implements ICacheService {
+export interface IRedisService extends IApplicationLifecycle {
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  set<T>(key: string, value: T, ttlSeconds?: number): Promise<void>;
+  get<T>(key: string): Promise<T | null>;
+  delete(key: string): Promise<void>;
+}
+
+class RedisService implements IRedisService {
   private client;
-  private github: IGitHubService;
-  private refreshInterval: number = 3600000; // 1 hour
-  private intervalId: NodeJS.Timeout | null = null;
+  private isConnected: boolean = false;
 
-  constructor(redisUrl: string, github: IGitHubService) {
+  constructor(private redisUrl: string) {
     this.client = createClient({ url: redisUrl });
-    this.github = github;
   }
 
   async connect(): Promise<void> {
+    if (this.isConnected) return;
+
     try {
       await this.client.connect();
+      this.isConnected = true;
       console.log('Redis client connected successfully');
     } catch (error) {
       console.error('Redis connection error:', error);
@@ -26,53 +32,83 @@ class RedisService implements ICacheService {
   }
 
   async disconnect(): Promise<void> {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
+    if (!this.isConnected) return;
 
-    if (this.client.isOpen) {
+    try {
       await this.client.disconnect();
+      this.isConnected = false;
       console.log('Redis client disconnected');
-    }
-  }
-
-  async initializeCache(): Promise<void> {
-    console.log('Initializing GitHub repository cache in Redis...');
-    await this.refreshCache();
-    this.intervalId = setInterval(() => this.refreshCache(), this.refreshInterval);
-  }
-
-  async refreshCache(): Promise<void> {
-    try {
-      const repositories = await this.github.getRepositories();
-      const cacheKey = `repos_${this.github.getUsername()}`;
-
-      await this.client.set(
-        cacheKey,
-        JSON.stringify(repositories),
-        { EX: 7200 } // 2 hours TTL
-      );
-
-      console.log(`Redis cache updated at ${new Date().toISOString()}. Fetched ${repositories.length} repositories.`);
     } catch (error) {
-      console.error('Failed to refresh GitHub repository cache:', error);
+      console.error('Redis disconnection error:', error);
+      throw error;
     }
   }
 
-  async getRepositories(): Promise<Repository[]> {
-    try {
-      const cacheKey = `repos_${this.github.getUsername()}`;
-      const cachedRepos = await this.client.get(cacheKey);
+  async set<T>(key: string, value: T, ttlSeconds?: number): Promise<void> {
+    if (!this.isConnected) {
+      throw new Error('Redis client not connected');
+    }
 
-      if (cachedRepos) {
-        return JSON.parse(cachedRepos) as Repository[];
+    try {
+      const serializedValue = JSON.stringify(value);
+      if (ttlSeconds) {
+        await this.client.set(key, serializedValue, { EX: ttlSeconds });
+      } else {
+        await this.client.set(key, serializedValue);
       }
-
-      return [];
     } catch (error) {
-      console.error('Error retrieving data from Redis:', error);
-      return [];
+      console.error(`Error setting Redis key ${key}:`, error);
+      throw error;
+    }
+  }
+
+  async get<T>(key: string): Promise<T | null> {
+    if (!this.isConnected) {
+      throw new Error('Redis client not connected');
+    }
+
+    try {
+      const value = await this.client.get(key);
+      return value ? JSON.parse(value) as T : null;
+    } catch (error) {
+      console.error(`Error getting Redis key ${key}:`, error);
+      throw error;
+    }
+  }
+
+  async delete(key: string): Promise<void> {
+    if (!this.isConnected) {
+      throw new Error('Redis client not connected');
+    }
+
+    try {
+      await this.client.del(key);
+    } catch (error) {
+      console.error(`Error deleting Redis key ${key}:`, error);
+      throw error;
+    }
+  }
+
+  // Lifecycle methods
+  async onStartup(): Promise<void> {
+    try {
+      console.log('Starting Redis service...');
+      await this.connect();
+      console.log('Redis service started successfully');
+    } catch (error) {
+      console.error('Redis service startup failed:', error);
+      throw error;
+    }
+  }
+
+  async onShutdown(): Promise<void> {
+    try {
+      console.log('Shutting down Redis service...');
+      await this.disconnect();
+      console.log('Redis service shutdown complete');
+    } catch (error) {
+      console.error('Redis service shutdown failed:', error);
+      throw error;
     }
   }
 }

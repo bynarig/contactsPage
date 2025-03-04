@@ -1,14 +1,9 @@
 // server/src/interfaces/github.interface.ts
 import { Repository } from '../types/github.types';
+import { IApplicationLifecycle } from './application-lifecycle.interface';
 
-export interface IGitHubService {
-  /**
-   * Get the current username configured for the GitHub service
-   */
+export interface IGitHubService extends IApplicationLifecycle {
   getUsername(): string;
-
-  /**
-   * Fetch repositories for the configured user
-   */
   getRepositories(): Promise<Repository[]>;
+  refreshCache(): Promise<void>;
 }

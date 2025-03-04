@@ -1,16 +1,16 @@
 // server/src/services/di.service.ts
 import { config } from 'dotenv';
 import GitHub from './github.service';
-import RedisService from './redis.service';
+import RedisService, { IRedisService } from './redis.service';
 import { IGitHubService } from '../interfaces/github.interface';
-import { ICacheService } from '../interfaces/cache.interface';
+import { IApplicationLifecycle } from '../interfaces/application-lifecycle.interface';
 
-// Load environment variables
 config();
 
 class DependencyContainer {
   private static instance: DependencyContainer;
   private services: Map<string, any> = new Map();
+  private lifecycleServices: IApplicationLifecycle[] = [];
 
   private constructor() {
     this.registerServices();
@@ -24,16 +24,18 @@ class DependencyContainer {
   }
 
   private registerServices(): void {
-    // GitHub service
-    const githubUsername = process.env.GITHUB_USERNAME || '';
-    const githubToken = process.env.GITHUB_TOKEN || '';
-    const githubService: IGitHubService = new GitHub(githubUsername, githubToken);
-    this.services.set('github', githubService);
-
-    // Redis service
+    // Redis service (generic)
     const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-    const redisService: ICacheService = new RedisService(redisUrl, githubService);
+    const redisService: IRedisService = new RedisService(redisUrl);
     this.services.set('redis', redisService);
+    this.lifecycleServices.push(redisService);
+
+    // GitHub service (uses Redis for caching)
+    const githubUsername = process.env.GITHUB_USERNAME || 'bynarig';
+    const githubToken = process.env.GITHUB_TOKEN || '';
+    const githubService: IGitHubService = new GitHub(githubUsername, githubToken, redisService);
+    this.services.set('github', githubService);
+    this.lifecycleServices.push(githubService);
   }
 
   get<T>(serviceName: string): T {
@@ -42,6 +44,10 @@ class DependencyContainer {
       throw new Error(`Service ${serviceName} not found in container`);
     }
     return service as T;
+  }
+
+  getLifecycleServices(): IApplicationLifecycle[] {
+    return [...this.lifecycleServices];
   }
 }
 
